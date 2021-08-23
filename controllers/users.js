@@ -22,7 +22,7 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  User.findById(req.body._id)
+  User.findById(req.user._id)
     .orFail(new NotFoundError('No user was found'))
     .then((user) => {
       if (!user) throw new NotFoundError('No user was found.');

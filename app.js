@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 
 const userRouter = require('./routes/users');
+const articleRouter = require('./routes/articles');
 const auth = require('./middlewares/auth');
 const { register, login } = require('./controllers/users');
 
@@ -23,15 +24,12 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
-
 app.post('/signup', register);
 app.post('/signin', login);
 
 app.use(auth);
 app.use('/', userRouter);
+app.use('/', articleRouter);
 
 app.get('*', (req, res) => {
   res.status(404);
@@ -39,7 +37,6 @@ app.get('*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
   const { statusCode = 500, message } = err;
 
   res.status(statusCode).send({ message: statusCode === 500 ? 'An error occured on the server' : message });
