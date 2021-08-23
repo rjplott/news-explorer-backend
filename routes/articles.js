@@ -3,9 +3,15 @@ const validator = require('validator');
 const articleRouter = require('express').Router();
 const { getArticles, createArticle, deleteArticle } = require('../controllers/articles');
 
-function validateUrl(string, helpers) {
+function validateLinkUrl(string, helpers) {
   if (!validator.isURL(string)) {
-    return helpers.error(400, '"avatar" is not a valid URL');
+    return helpers.error(400, '"link" is not a valid URL');
+  }
+  return string;
+}
+function validateImageUrl(string, helpers) {
+  if (!validator.isURL(string)) {
+    return helpers.error(400, '"image" is not a valid URL');
   }
   return string;
 }
@@ -25,8 +31,8 @@ articleRouter.post('/articles', celebrate({
     text: Joi.string().required(),
     date: Joi.string().required(),
     source: Joi.string().required(),
-    link: Joi.string().required().custom(validateUrl),
-    image: Joi.string().required().custom(validateUrl),
+    link: Joi.string().required().custom(validateLinkUrl),
+    image: Joi.string().required().custom(validateImageUrl),
     user: Joi.object().keys({
       _id: Joi.string().required().alphanum().length(24),
     }),
