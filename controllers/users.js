@@ -10,17 +10,6 @@ const ConflictError = require('../errors/conflict-error');
 const UnauthorizedError = require('../errors/auth-error');
 const User = require('../models/user');
 
-module.exports.createUser = (req, res, next) => {
-  const { name, email, password } = req.body;
-
-  User.create({ name, email, password })
-    .then((user) => {
-      if (!user) throw new NotFoundError('Requested resource was not located.');
-      return res.send({ data: user });
-    })
-    .catch(next);
-};
-
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(new NotFoundError('No user was found'))

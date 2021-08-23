@@ -18,6 +18,10 @@ const articleSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  source: {
+    type: String,
+    required: true,
+  },
   link: {
     type: String,
     required: true,

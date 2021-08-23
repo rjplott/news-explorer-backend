@@ -1,7 +1,13 @@
 const userRouter = require('express').Router();
-const { createUser, getCurrentUser } = require('../controllers/users');
+const { celebrate, Joi } = require('celebrate');
+const { getCurrentUser } = require('../controllers/users');
 
-userRouter.post('/users', createUser);
-userRouter.get('/users/me', getCurrentUser);
+userRouter.get('/users/me', celebrate({
+  body: Joi.object().keys({
+    user: Joi.object().keys({
+      _id: Joi.string().required().alphanum().length(24),
+    }).unknown(true),
+  }),
+}), getCurrentUser);
 
 module.exports = userRouter;
