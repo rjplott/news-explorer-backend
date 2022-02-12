@@ -1,11 +1,13 @@
 const NotFoundError = require('../errors/not-found');
-const UnauthorizedError = require('../errors/auth-error');
+const ForbiddenError = require('../errors/forbidden-error');
 const Article = require('../models/articles');
 
 module.exports.getArticles = (req, res, next) => {
   Article.find({ owner: req.user._id })
     .then((articles) => {
-      if (articles.length < 1) throw new NotFoundError('No articles were found.');
+      if (articles.length < 1) {
+        throw new NotFoundError('No articles were found.');
+      }
       return res.status(200).send({ data: articles });
     })
     .catch(next);
@@ -23,12 +25,20 @@ module.exports.createArticle = (req, res, next) => {
 module.exports.deleteArticle = (req, res, next) => {
   const id = req.params.articleId;
 
-  Article.findById(id).select('+owner').orFail(new NotFoundError('Requested article was not located.'))
+  Article.findById(id)
+    .select('+owner')
+    .orFail(new NotFoundError('Requested article was not located.'))
     .then((article) => {
-      if (article.owner.toString() !== req.user._id) throw new UnauthorizedError('You are not authorized to delete this article');
+      if (article.owner.toString() !== req.user._id) {
+        throw new ForbiddenError(
+          'You are not authorized to delete this article',
+        );
+      }
       return article;
     })
-    .then((article) => Article.findByIdAndDelete(article._id).orFail(new NotFoundError('Requested article was not located.')))
+    .then((article) => Article.findByIdAndDelete(article._id).orFail(
+      new NotFoundError('Requested article was not located.'),
+    ))
     .then((article) => res.send({ data: article }))
     .catch(next);
 };
