@@ -19,7 +19,7 @@ function validateImageUrl(string, helpers) {
 articleRouter.get('/articles', celebrate({
   body: Joi.object().keys({
     user: Joi.object().keys({
-      _id: Joi.string().required().alphanum().length(24),
+      _id: Joi.string().required().hex().length(24),
     }).unknown(true),
   }),
 }), getArticles);
@@ -34,18 +34,18 @@ articleRouter.post('/articles', celebrate({
     link: Joi.string().required().custom(validateLinkUrl),
     image: Joi.string().required().custom(validateImageUrl),
     user: Joi.object().keys({
-      _id: Joi.string().required().alphanum().length(24),
+      _id: Joi.string().required().hex().length(24),
     }),
   }),
 }), createArticle);
 
 articleRouter.delete('/articles/:articleId', celebrate({
   params: Joi.object().keys({
-    articleId: Joi.string().required().alphanum().length(24),
+    articleId: Joi.string().required().hex().length(24),
   }),
   body: Joi.object().keys({
     user: Joi.object().keys({
-      _id: Joi.string().required().alphanum().length(24),
+      _id: Joi.string().required().hex().length(24),
     }).unknown(true),
   }),
 }), deleteArticle);

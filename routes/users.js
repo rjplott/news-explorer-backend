@@ -5,7 +5,7 @@ const { getCurrentUser } = require('../controllers/users');
 userRouter.get('/users/me', celebrate({
   body: Joi.object().keys({
     user: Joi.object().keys({
-      _id: Joi.string().required().alphanum().length(24),
+      _id: Joi.string().required().hex().length(24),
     }).unknown(true),
   }),
 }), getCurrentUser);
