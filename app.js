@@ -9,7 +9,9 @@ const { errors, celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 const userRouter = require('./routes/users');
 const articleRouter = require('./routes/articles');
+const NotFoundError = require('./errors/not-found');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/error-handler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { register, login } = require('./controllers/users');
 
@@ -61,20 +63,16 @@ app.use(auth);
 app.use('/', userRouter);
 app.use('/', articleRouter);
 
-app.get('*', (req, res) => {
-  res.status(404);
-  res.send({ message: 'Requested resource not found' });
-});
+app
+  .get('*', (next) => {
+    next(new NotFoundError({ message: 'Requested resource not found' }));
+  });
 
 app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res.status(statusCode).send({ message: statusCode === 500 ? 'An error occured on the server' : message });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
 
