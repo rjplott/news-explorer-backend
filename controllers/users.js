@@ -8,13 +8,19 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const NotFoundError = require('../errors/not-found');
 const ConflictError = require('../errors/conflict-error');
 const UnauthorizedError = require('../errors/auth-error');
+const {
+  userNotFound,
+  emailTaken,
+  userNotCreated,
+  invalidCredentials,
+} = require('../errors/error-message');
 const User = require('../models/user');
 
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(new NotFoundError('No user was found'))
+    .orFail(new NotFoundError(userNotFound))
     .then((user) => {
-      if (!user) throw new NotFoundError('No user was found.');
+      if (!user) throw new NotFoundError(userNotFound);
       return res.status(200).send({ data: user });
     })
     .catch(next);
@@ -25,14 +31,14 @@ module.exports.register = (req, res, next) => {
 
   User.exists({ email })
     .then((user) => {
-      if (user) throw new ConflictError('Email has already been registered.');
+      if (user) throw new ConflictError(emailTaken);
     })
     .catch(next);
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({ name, email, password: hash }))
     .then((user) => {
-      if (!user) throw new NotFoundError('User was not created.  Please try again.');
+      if (!user) throw new NotFoundError(userNotCreated);
       return res.send({
         data: {
           name: user.name,
@@ -49,7 +55,7 @@ module.exports.login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) next(new UnauthorizedError('Email or password is invalid'));
+      if (!user) next(new UnauthorizedError(invalidCredentials));
 
       const key = NODE_ENV === 'production' ? JWT_SECRET : 'baf59bf81d780d46135f29b53e34ea58f78d0d920b6e18d8f193c199f69295fe';
 
