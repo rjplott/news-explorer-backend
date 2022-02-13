@@ -9,6 +9,7 @@ const { errors } = require('celebrate');
 const router = require('./routes/index');
 const errorHandler = require('./middlewares/error-handler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const limiter = require('./middlewares/rate-limit');
 
 require('dotenv').config();
 
@@ -28,6 +29,7 @@ mongoose.connect(dbAddress, {
 app.use(helmet());
 app.use(cors());
 app.options('*', cors());
+app.use(limiter);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
